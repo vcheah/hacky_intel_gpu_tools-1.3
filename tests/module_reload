@@ -1,0 +1,42 @@
+#!/bin/bash
+#
+# Testcase: Reload the drm module
+#
+# ... we've broken this way too often :(
+#
+
+SOURCE_DIR="$( dirname "${BASH_SOURCE[0]}" )"
+. $SOURCE_DIR/drm_lib.sh
+
+# no other drm service should be running, so we can just unbind
+
+# vtcon0 is vga, vtcon1 fbcon and let's pray that won't change due to boot load
+# time changes
+if ! echo 0 > /sys/class/vtconsole/vtcon1/bind ; then
+	echo -e "no kms unload support"
+	echo "please enable CONFIG_VT_HW_CONSOLE_BINDING in the kernel"
+	exit 77
+fi
+
+#ignore errors in ips - gen5 only
+rmmod intel_ips &> /dev/null
+rmmod i915
+#ignore errors in intel-gtt, often built-in
+rmmod intel-gtt &> /dev/null
+# drm may be used by other devices (nouveau, radeon, udl, etc)
+rmmod drm_kms_helper &> /dev/null
+rmmod drm &> /dev/null
+
+if lsmod | grep i915 &> /dev/null ; then
+	echo WARNING: i915.ko still loaded!
+	exitcode=1
+else
+	echo module successfully unloaded
+	exitcode=0
+fi
+
+modprobe i915
+echo 1 > /sys/class/vtconsole/vtcon1/bind
+
+# try to run something
+$SOURCE_DIR/gem_exec_nop > /dev/null && echo "module successfully loaded again"

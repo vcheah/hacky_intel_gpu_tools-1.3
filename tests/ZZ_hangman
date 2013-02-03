@@ -1,0 +1,42 @@
+#!/bin/bash
+#
+# Testcase: Simulate gpu hang
+#
+# This check uses the stop_rings facility to exercise the gpu hang code.
+# by reading /sys/kernel/debug/dri/0/i915_emon_status too quickly
+#
+
+SOURCE_DIR="$( dirname "${BASH_SOURCE[0]}" )"
+. $SOURCE_DIR/drm_lib.sh
+
+oldpath=`pwd`
+
+cd $i915_path
+
+if [ ! -f i915_ring_stop ] ; then
+	echo "kernel doesn't support ring stopping"
+	exit 77
+fi
+
+if cat i915_error_state | grep -v "no error state collected" > /dev/null ; then
+	echo "gpu hang dectected"
+	exit 1
+fi
+
+# stop rings
+echo 0xf > i915_ring_stop
+echo "rings stopped"
+
+(cd $oldpath; $SOURCE_DIR/gem_exec_big) > /dev/null
+
+if cat i915_error_state | grep -v "no error state collected" > /dev/null ; then
+	echo "gpu hang correctly dectected"
+else
+	echo "gpu hang not dectected"
+	exit 2
+fi
+
+# clear error state
+echo > i915_error_state
+
+exit 0
