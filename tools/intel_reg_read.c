@@ -64,7 +64,7 @@ static void dump_range(uint32_t start, uint32_t end)
 	        }
 
 		printf("0x%X : 0x%X\n", i,
-		       *(volatile uint32_t *)((volatile char*)mmio  ioffset));
+		       *(volatile uint32_t *)((volatile char*)mmio + offset));
 		}
 }
 

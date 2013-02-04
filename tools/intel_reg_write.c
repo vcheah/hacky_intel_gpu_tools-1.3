@@ -35,7 +35,7 @@
 int main(int argc, char** argv)
 {
 	uint32_t reg, value;
-	volatile uint32_t *ptr;
+	volatile uint32_t *ptr,offset;
 	struct pci_device *pci_dev;
 
 	if (argc < 3) {
@@ -57,7 +57,7 @@ int main(int argc, char** argv)
 			offset = 0x0; 
         }
 
-	ptr = (volatile uint32_t *)((volatile char *)mmio  reg  offset);
+	ptr = (volatile uint32_t *)((volatile char *)mmio + reg + offset);
 
 	printf("Value before: 0x%X\n", *ptr);
 	*ptr = value;
