@@ -1,6 +1,6 @@
 
 
-fndef _INTEL_VLV_H_
+#ifndef _INTEL_VLV_H_
 #define _INTEL_VLV_H_
 
 #define false 0
@@ -47,16 +47,16 @@ static int IS_DISPLAYREG(uint32_t reg)
 		return false;
 
 	if (reg >= RENDER_RING_BASE &&
-                        reg < RENDER_RING_BASE  0xff)
+                        reg < RENDER_RING_BASE + 0xff)
 		return false;
 
 
 	if (reg >= GEN6_BSD_RING_BASE &&
-                        reg < GEN6_BSD_RING_BASE  0xff)
+                        reg < GEN6_BSD_RING_BASE + 0xff)
 		return false;
 
 	if (reg >= BLT_RING_BASE &&
-                        reg < BLT_RING_BASE  0xff)
+                        reg < BLT_RING_BASE + 0xff)
                 return false;
 
 	if (reg == PGTBL_ER)
@@ -101,7 +101,7 @@ static int IS_DISPLAYREG(uint32_t reg)
                 return false;
 
 	if (reg >= FENCE_REG_SANDYBRIDGE_0 &&
-                        reg < (FENCE_REG_SANDYBRIDGE_0  (16*8)))
+                        reg < (FENCE_REG_SANDYBRIDGE_0 + (16*8)))
                 return false;
 
         if (reg >= VLV_IIR_RW &&
