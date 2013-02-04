@@ -70,7 +70,7 @@ int main(int argc, char **argv)
 				break;
 		} else {
 			int offset;
-			if (IS_G4X(devid) || IS_GEN5(devid))
+			if (IS_G4X(devid) || IS_GEN5(devid) || IS_VALLEYVIEW(devid))
 				offset = MB(2);
 			else
 				offset = KB(512);

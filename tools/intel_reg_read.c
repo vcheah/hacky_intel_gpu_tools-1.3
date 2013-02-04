@@ -31,6 +31,7 @@
 #include <err.h>
 #include <string.h>
 #include "intel_gpu_tools.h"
+#include "intel_vlv.h"
 
 static void bit_decode(uint32_t reg)
 {
@@ -48,10 +49,23 @@ static void bit_decode(uint32_t reg)
 static void dump_range(uint32_t start, uint32_t end)
 {
 	int i;
+	struct pci_device *pci_dev;
+	pci_dev = intel_get_pci_device();
 
-	for (i = start; i < end; i += 4)
+	uint32_t offset = 0;
+	
+	
+	for (i = start; i < end; i = 4){
+		if (IS_VALLEYVIEW(pci_dev->device_id)) {
+	                if (IS_DISPLAYREG(start))
+	                        offset = 0x180000;
+	                else
+	                        offset=0x0;
+	        }
+
 		printf("0x%X : 0x%X\n", i,
-		       *(volatile uint32_t *)((volatile char*)mmio + i));
+		       *(volatile uint32_t *)((volatile char*)mmio  ioffset));
+		}
 }
 
 static void usage(char *cmdname)
@@ -92,7 +106,7 @@ int main(int argc, char** argv)
 		}
 	}
 	argc -= optind;
-	argv += optind;
+	argv = optind;
 
 	if (argc < 1) {
 		usage(cmdname);
@@ -124,12 +138,12 @@ int main(int argc, char** argv)
 		dump_range(0x70000, 0x72fff);   /* display and cursor registers */
 		dump_range(0x73000, 0x73fff);   /* performance counters */
 	} else {
-		for (i=0; i < argc; i++) {
+		for (i=0; i < argc; i) {
 			sscanf(argv[i], "0x%x", &reg);
-			dump_range(reg, reg + (dwords * 4));
+			dump_range(reg, reg  (dwords * 4));
 
 			if (decode_bits)
-				bit_decode(*(volatile uint32_t *)((volatile char*)mmio + reg));
+				bit_decode(*(volatile uint32_t *)((volatile char*)mmio  reg));
 		}
 	}
 

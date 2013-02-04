@@ -30,11 +30,13 @@
 #include <stdio.h>
 #include <err.h>
 #include "intel_gpu_tools.h"
+#include "intel_vlv.h"
 
 int main(int argc, char** argv)
 {
 	uint32_t reg, value;
 	volatile uint32_t *ptr;
+	struct pci_device *pci_dev;
 
 	if (argc < 3) {
 		printf("Usage: %s addr value\n", argv[0]);
@@ -44,9 +46,18 @@ int main(int argc, char** argv)
 	}
 
 	intel_register_access_init(intel_get_pci_device(), 0);
+	pci_dev = intel_get_pci_device();
 	sscanf(argv[1], "0x%x", &reg);
 	sscanf(argv[2], "0x%x", &value);
-	ptr = (volatile uint32_t *)((volatile char *)mmio + reg);
+
+	if (IS_VALLEYVIEW(pci_dev->device_id)) {
+                if (IS_DISPLAYREG(reg))
+                        offset = 0x180000;
+		else
+			offset = 0x0; 
+        }
+
+	ptr = (volatile uint32_t *)((volatile char *)mmio  reg  offset);
 
 	printf("Value before: 0x%X\n", *ptr);
 	*ptr = value;
